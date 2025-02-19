@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VO2 Betting Game</title>
+  <!-- Link to external CSS -->
+  <link rel="stylesheet" href="style.css">
+  <!-- Include D3 library -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+  <div class="header">
+    <h2>VO2 Betting Game</h2>
+    <p>
+      There are two participants of different age ranges. Place your bet on one of them.
+      Your bet wins if your chosen participant has a higher VO2 level than the other.
+    </p>
+  </div>
+
+  <div class="main-container">
+    <!-- Left Column: Betting Controls -->
+    <div class="betting-controls">
+      <h2>Betting Controls</h2>
+      <div class="participant-info" id="participant1">
+        <label>Participant 1</label>
+        <p>VO2 Level: <span id="vo2-1">--</span></p>
+        <p>Age Range: <span id="age-1">30-39</span></p>
+        <p class="odds">Odds: <span id="odds-1">+124</span></p>
+        <input type="radio" name="bet-choice" value="1" />
+      </div>
+      <div class="participant-info" id="participant2">
+        <label>Participant 2</label>
+        <p>VO2 Level: <span id="vo2-2">--</span></p>
+        <p>Age Range: <span id="age-2">20-29</span></p>
+        <p class="odds">Odds: <span id="odds-2">-154</span></p>
+        <input type="radio" name="bet-choice" value="2" />
+      </div>
+      <div class="bet-row">
+        <input type="number" id="bet-amount" placeholder="Bet Amount" min="1" />
+        <button onclick="placeBet()">Place Bet</button>
+      </div>
+      <div class="result" id="result"></div>
+      <div class="earnings" id="earnings">Earnings: $0</div>
+    </div>
+
+    <!-- Right Column: Charts -->
+    <div class="charts-container">
+      <div class="filter-controls">
+        <label><input type="checkbox" id="filter-participant1" checked> Show Participant 1 bets</label>
+        <label><input type="checkbox" id="filter-participant2" checked> Show Participant 2 bets</label>
+      </div>
+      <!-- Bar Chart for Bet History -->
+      <div id="chart" class="chart">
+        <h3>Bet History (Per Bet Outcome)</h3>
+        <svg width="600" height="400"></svg>
+      </div>
+      <!-- Line Chart for Cumulative Earnings -->
+      <div id="line-chart" class="chart">
+        <h3>Cumulative Earnings</h3>
+        <svg width="600" height="400"></svg>
+      </div>
+      <!-- VO2 Running Totals by Age Range Chart -->
+      <div id="vo2-chart" class="chart">
+        <h3>VO2 Running Totals by Age Range</h3>
+        <svg width="600" height="400"></svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="tooltip" id="tooltip"></div>
+  
+  <!-- Link to external JavaScript -->
+  <script src="script.js"></script>
+</body>
+</html>

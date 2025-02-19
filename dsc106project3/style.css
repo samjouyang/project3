@@ -1,0 +1,121 @@
+/* Basic Reset */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background: #f0f0f0;
+  }
+  .header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  /* Main container with two columns */
+  .main-container {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  
+  /* Left column: Betting Controls */
+  .betting-controls {
+    flex: 0 0 300px;
+    background: #fff;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    height: fit-content;
+  }
+  .betting-controls h2 {
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  .participant-info {
+    margin-bottom: 15px;
+  }
+  .participant-info label {
+    font-weight: bold;
+    margin-right: 5px;
+  }
+  .participant-info p {
+    font-size: 14px;
+    margin: 3px 0;
+  }
+  .participant-info .odds {
+    font-style: italic;
+    color: #666;
+  }
+  .bet-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 10px;
+    justify-content: center;
+  }
+  .bet-row input[type="number"] {
+    width: 100px;
+    padding: 8px;
+    font-size: 16px;
+  }
+  .bet-row button {
+    padding: 8px 16px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  .result, .earnings {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 16px;
+  }
+  
+  /* Right column: Charts (stacked vertically) */
+  .charts-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .chart {
+    background: #fff;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    position: relative;
+  }
+  .chart h3 {
+    text-align: center;
+    margin-bottom: 5px;
+  }
+  /* Set SVG size for charts */
+  .chart svg {
+    width: 600px;
+    height: 400px;
+    display: block;
+    margin: auto;
+  }
+  /* Filter controls above the first chart */
+  .filter-controls {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  .filter-controls label {
+    margin: 0 10px;
+    font-size: 14px;
+  }
+  /* Tooltip styling */
+  .tooltip {
+    position: absolute;
+    background-color: rgba(0,0,0,0.8);
+    color: #fff;
+    padding: 5px;
+    border-radius: 5px;
+    pointer-events: none;
+    font-size: 12px;
+    display: none;
+  }
+  
