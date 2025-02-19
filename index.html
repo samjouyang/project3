@@ -4,7 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>VO2 Betting Game</title>
+  <!-- Link to external CSS -->
   <link rel="stylesheet" href="style.css">
+  <!-- Include D3 library -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 <body>
@@ -25,6 +27,7 @@
   </div>
 
   <div class="main-container">
+    <!-- Left Column: Betting Controls -->
     <div class="betting-controls">
       <h2>Betting Controls</h2>
       <div class="participant-info" id="participant1">
@@ -49,32 +52,33 @@
       <div class="earnings" id="earnings">Earnings: $0</div>
     </div>
 
-
+    <!-- Right Column: Charts -->
     <div class="charts-container">
       <div class="filter-controls">
         <label><input type="checkbox" id="filter-participant1" checked> Show Participant 1 bets</label>
         <label><input type="checkbox" id="filter-participant2" checked> Show Participant 2 bets</label>
       </div>
-
+      <!-- Bar Chart for Bet History -->
       <div id="chart" class="chart">
         <h3>Bet History (Per Bet Outcome)</h3>
         <svg width="600" height="400"></svg>
       </div>
-
+      <!-- Line Chart for Cumulative Earnings -->
       <div id="line-chart" class="chart">
         <h3>Cumulative Earnings</h3>
         <svg width="600" height="400"></svg>
       </div>
+      <!-- VO2 Running Totals by Age Range Chart -->
       <div id="vo2-chart" class="chart">
         <h3>VO2 Running Totals by Age Range</h3>
         <svg width="600" height="400"></svg>
       </div>
-
     </div>
   </div>
 
   <div class="tooltip" id="tooltip"></div>
   
+  <!-- Link to external JavaScript -->
   <script src="script.js"></script>
 </body>
 </html>

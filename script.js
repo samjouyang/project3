@@ -1,10 +1,10 @@
 
 const data = [
-  //   { ID: 1, time: 500, VO2: 1705.0, Age_Range: "30-39" },
-  //   { ID: 2, time: 501, VO2: 2262.0, Age_Range: "30-39" },
-  //   { ID: 3, time: 500, VO2: 2615.0, Age_Range: "10-19" },
-  //   { ID: 4, time: 500, VO2: 3120.0, Age_Range: "20-29" }
-  // ];
+    // { ID: 1, time: 500, VO2: 1705.0, Age_Range: "30-39" },
+    // { ID: 2, time: 501, VO2: 2262.0, Age_Range: "30-39" },
+    // { ID: 3, time: 500, VO2: 2615.0, Age_Range: "10-19" },
+    // { ID: 4, time: 500, VO2: 3120.0, Age_Range: "20-29" }
+//   ];
 
     { ID: 1, time: 500, VO2: 1705.0, Age_Range: '30-39' },
     { ID: 2, time: 501, VO2: 2262.0, Age_Range: '30-39' },
@@ -1030,7 +1030,150 @@ function updateBarChart() {
      .attr("height", d => Math.abs(yScale(d.earningsChange) - yScale(0)));
 }
 
-// 2. Cumulative Earnings Line Chart (Second Graph)
+// // 2. Cumulative Earnings Line Chart (Second Graph)
+// function updateLineChart(xDomainOverride) {
+//   const svg = d3.select("#line-chart svg");
+//   const width = +svg.attr("width");
+//   const height = +svg.attr("height");
+//   svg.selectAll("*").remove();
+
+//   const margin = { top: 20, right: 20, bottom: 40, left: 50 };
+//   let cumulativeData = [];
+//   let sum = 0;
+//   betHistory.forEach(d => {
+//     sum += d.earningsChange;
+//     cumulativeData.push({ bet: d.betNumber, earnings: sum });
+//   });
+//   if (cumulativeData.length === 0) return;
+
+//   const totalBets = cumulativeData.length;
+//   let xDomainStart = totalBets > 15 ? totalBets - 14 : 1;
+//   let xDomainEnd = totalBets;
+//   if (xDomainOverride) {
+//     [xDomainStart, xDomainEnd] = xDomainOverride;
+//   }
+
+//   const xScale = d3
+//     .scaleLinear()
+//     .domain([xDomainStart, xDomainEnd])
+//     .range([margin.left, width - margin.right]);
+//   const yMin = d3.min(cumulativeData, d => d.earnings);
+//   const yMax = d3.max(cumulativeData, d => d.earnings);
+//   const yScale = d3
+//     .scaleLinear()
+//     .domain([yMin - 10, yMax + 10])
+//     .range([height - margin.bottom, margin.top]);
+
+//   const xAxis = d3.axisBottom(xScale).ticks(Math.min(15, totalBets));
+//   svg.append("g")
+//      .attr("transform", `translate(0, ${height - margin.bottom})`)
+//      .call(xAxis)
+//      .append("text")
+//      .attr("x", width - margin.right)
+//      .attr("y", -10)
+//      .attr("fill", "black")
+//      .style("text-anchor", "end")
+//      .text("Bet Number");
+
+//   const yAxis = d3.axisLeft(yScale);
+//   svg.append("g")
+//      .attr("transform", `translate(${margin.left}, 0)`)
+//      .call(yAxis)
+//      .append("text")
+//      .attr("transform", "rotate(-90)")
+//      .attr("x", -height / 2)
+//      .attr("y", -margin.left + 15)
+//      .attr("fill", "black")
+//      .style("text-anchor", "middle")
+//      .text("Cumulative Earnings ($)");
+
+//   svg.append("line")
+//      .attr("x1", margin.left)
+//      .attr("x2", width - margin.right)
+//      .attr("y1", yScale(0))
+//      .attr("y2", yScale(0))
+//      .attr("stroke", "#555")
+//      .attr("stroke-dasharray", "4");
+
+//   for (let i = 0; i < cumulativeData.length - 1; i++) {
+//     if (cumulativeData[i].bet < xDomainStart) continue;
+//     const d1 = cumulativeData[i],
+//       d2 = cumulativeData[i + 1];
+//     function drawSegment(x1, y1, x2, y2, color) {
+//       svg.append("line")
+//          .attr("x1", xScale(x1))
+//          .attr("y1", yScale(y1))
+//          .attr("x2", xScale(x2))
+//          .attr("y2", yScale(y2))
+//          .attr("stroke", color)
+//          .attr("stroke-width", 2);
+//     }
+//     if (
+//       (d1.earnings >= 0 && d2.earnings >= 0) ||
+//       (d1.earnings < 0 && d2.earnings < 0)
+//     ) {
+//       const segColor = d1.earnings >= 0 ? "green" : "red";
+//       drawSegment(d1.bet, d1.earnings, d2.bet, d2.earnings, segColor);
+//     } else {
+//       const t =
+//         d1.bet +
+//         ((d2.bet - d1.bet) * d1.earnings) / (d1.earnings - d2.earnings);
+//       const color1 = d1.earnings >= 0 ? "green" : "red";
+//       drawSegment(d1.bet, d1.earnings, t, 0, color1);
+//       const color2 = d2.earnings >= 0 ? "green" : "red";
+//       drawSegment(t, 0, d2.bet, d2.earnings, color2);
+//     }
+//   }
+//   svg.selectAll("circle")
+//      .data(cumulativeData)
+//      .enter()
+//      .append("circle")
+//      .attr("id", d => "circle-bet-" + d.bet)
+//      .attr("cx", d => xScale(d.bet))
+//      .attr("cy", d => yScale(d.earnings))
+//      .attr("r", 4)
+//      .attr("fill", "white")
+//      .attr("stroke", "black")
+//      .attr("stroke-width", 1)
+//      .on("mouseover", function (event, d) {
+//        d3.select("#tooltip")
+//          .style("display", "block")
+//          .html(`Bet #: ${d.bet}<br>Cumulative: $${d.earnings}`);
+//      })
+//      .on("mouseout", function () {
+//        d3.select("#tooltip").style("display", "none");
+//      });
+
+//   const brush = d3
+//     .brushX()
+//     .extent([
+//       [margin.left, margin.top],
+//       [width - margin.right, height - margin.bottom]
+//     ])
+//     .on("end", brushed);
+//   svg.append("g").attr("class", "brush").call(brush);
+
+//   function brushed({ selection }) {
+//     if (!selection) {
+//       updateLineChart([xDomainStart, xDomainEnd]);
+//       return;
+//     }
+//     const [x0, x1] = selection;
+//     const newDomain = [
+//       Math.round(xScale.invert(x0)),
+//       Math.round(xScale.invert(x1))
+//     ];
+//     svg.select(".brush").call(brush.move, null);
+//     updateLineChart(newDomain);
+//   }
+// }
+
+
+
+
+
+
+
 function updateLineChart(xDomainOverride) {
   const svg = d3.select("#line-chart svg");
   const width = +svg.attr("width");
@@ -1038,16 +1181,17 @@ function updateLineChart(xDomainOverride) {
   svg.selectAll("*").remove();
 
   const margin = { top: 20, right: 20, bottom: 40, left: 50 };
+  if (!betHistory || betHistory.length === 0) return;
+
   let cumulativeData = [];
   let sum = 0;
   betHistory.forEach(d => {
     sum += d.earningsChange;
     cumulativeData.push({ bet: d.betNumber, earnings: sum });
   });
-  if (cumulativeData.length === 0) return;
 
   const totalBets = cumulativeData.length;
-  let xDomainStart = totalBets > 15 ? totalBets - 14 : 1;
+  let xDomainStart = Math.max(1, totalBets - 14);
   let xDomainEnd = totalBets;
   if (xDomainOverride) {
     [xDomainStart, xDomainEnd] = xDomainOverride;
@@ -1056,13 +1200,16 @@ function updateLineChart(xDomainOverride) {
   const xScale = d3
     .scaleLinear()
     .domain([xDomainStart, xDomainEnd])
-    .range([margin.left, width - margin.right]);
+    .range([margin.left, width - margin.right])
+    .clamp(true);
+
   const yMin = d3.min(cumulativeData, d => d.earnings);
   const yMax = d3.max(cumulativeData, d => d.earnings);
   const yScale = d3
     .scaleLinear()
     .domain([yMin - 10, yMax + 10])
-    .range([height - margin.bottom, margin.top]);
+    .range([height - margin.bottom, margin.top])
+    .nice();
 
   const xAxis = d3.axisBottom(xScale).ticks(Math.min(15, totalBets));
   svg.append("g")
@@ -1095,35 +1242,28 @@ function updateLineChart(xDomainOverride) {
      .attr("stroke", "#555")
      .attr("stroke-dasharray", "4");
 
+  function drawSegment(x1, y1, x2, y2, color) {
+    svg.append("line")
+       .attr("x1", xScale(x1))
+       .attr("y1", yScale(y1))
+       .attr("x2", xScale(x2))
+       .attr("y2", yScale(y2))
+       .attr("stroke", color)
+       .attr("stroke-width", 2);
+  }
+
   for (let i = 0; i < cumulativeData.length - 1; i++) {
     if (cumulativeData[i].bet < xDomainStart) continue;
-    const d1 = cumulativeData[i],
-      d2 = cumulativeData[i + 1];
-    function drawSegment(x1, y1, x2, y2, color) {
-      svg.append("line")
-         .attr("x1", xScale(x1))
-         .attr("y1", yScale(y1))
-         .attr("x2", xScale(x2))
-         .attr("y2", yScale(y2))
-         .attr("stroke", color)
-         .attr("stroke-width", 2);
-    }
-    if (
-      (d1.earnings >= 0 && d2.earnings >= 0) ||
-      (d1.earnings < 0 && d2.earnings < 0)
-    ) {
-      const segColor = d1.earnings >= 0 ? "green" : "red";
-      drawSegment(d1.bet, d1.earnings, d2.bet, d2.earnings, segColor);
+    const d1 = cumulativeData[i], d2 = cumulativeData[i + 1];
+    if ((d1.earnings >= 0 && d2.earnings >= 0) || (d1.earnings < 0 && d2.earnings < 0)) {
+      drawSegment(d1.bet, d1.earnings, d2.bet, d2.earnings, d1.earnings >= 0 ? "green" : "red");
     } else {
-      const t =
-        d1.bet +
-        ((d2.bet - d1.bet) * d1.earnings) / (d1.earnings - d2.earnings);
-      const color1 = d1.earnings >= 0 ? "green" : "red";
-      drawSegment(d1.bet, d1.earnings, t, 0, color1);
-      const color2 = d2.earnings >= 0 ? "green" : "red";
-      drawSegment(t, 0, d2.bet, d2.earnings, color2);
+      const t = d1.bet + ((d2.bet - d1.bet) * d1.earnings) / (d1.earnings - d2.earnings);
+      drawSegment(d1.bet, d1.earnings, t, 0, d1.earnings >= 0 ? "green" : "red");
+      drawSegment(t, 0, d2.bet, d2.earnings, d2.earnings >= 0 ? "green" : "red");
     }
   }
+
   svg.selectAll("circle")
      .data(cumulativeData)
      .enter()
@@ -1155,7 +1295,7 @@ function updateLineChart(xDomainOverride) {
 
   function brushed({ selection }) {
     if (!selection) {
-      updateLineChart([xDomainStart, xDomainEnd]);
+      updateLineChart();
       return;
     }
     const [x0, x1] = selection;
@@ -1169,91 +1309,102 @@ function updateLineChart(xDomainOverride) {
 }
 
 
-// function updateVo2Chart() {
-//   const svg = d3.select("#vo2-chart svg");
-//   const width = +svg.attr("width");
-//   const height = +svg.attr("height");
-//   svg.selectAll("*").remove();
-//   const margin = { top: 20, right: 20, bottom: 40, left: 50 };
-//   if (vo2RunningData.length === 0) return;
 
-//   const xScale = d3
-//     .scaleLinear()
-//     .domain(d3.extent(vo2RunningData, d => d.bet))
-//     .range([margin.left, width - margin.right]);
-//   let yMin = Infinity,
-//     yMax = -Infinity;
-//   vo2RunningData.forEach(d => {
-//     ageRanges.forEach(range => {
-//       yMin = Math.min(yMin, d[range] || 0);
-//       yMax = Math.max(yMax, d[range] || 0);
-//     });
-//   });
-//   const yScale = d3
-//     .scaleLinear()
-//     .domain([yMin - 10, yMax + 10])
-//     .range([height - margin.bottom, margin.top]);
 
-//   // Draw axes.
-//   const xAxis = d3.axisBottom(xScale);
-//   svg.append("g")
-//      .attr("transform", `translate(0, ${height - margin.bottom})`)
-//      .call(xAxis)
-//      .append("text")
-//      .attr("x", width - margin.right)
-//      .attr("y", -10)
-//      .attr("fill", "black")
-//      .style("text-anchor", "end")
-//      .text("Bet Number");
 
-//   const yAxis = d3.axisLeft(yScale);
-//   svg.append("g")
-//      .attr("transform", `translate(${margin.left}, 0)`)
-//      .call(yAxis)
-//      .append("text")
-//      .attr("x", 5)
-//      .attr("y", margin.top)
-//      .attr("fill", "black")
-//      .text("VO₂ Running Total");
 
-//   const colorScale = d3
-//     .scaleOrdinal()
-//     .domain(ageRanges)
-//     .range(["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd"]);
 
-//   ageRanges.forEach(range => {
-//     const line = d3
-//       .line()
-//       .x(d => xScale(d.bet))
-//       .y(d => yScale(d[range] || 0))
-//       .curve(d3.curveMonotoneX);
-//     svg.append("path")
-//        .datum(vo2RunningData)
-//        .attr("fill", "none")
-//        .attr("stroke", colorScale(range))
-//        .attr("stroke-width", 2)
-//        .attr("d", line);
-//   });
 
-//   // Add a legend.
-//   const legend = svg
-//     .append("g")
-//     .attr("transform", `translate(${width - margin.right - 100}, ${margin.top})`);
-//   ageRanges.forEach((range, i) => {
-//     legend.append("rect")
-//           .attr("x", 0)
-//           .attr("y", i * 20)
-//           .attr("width", 10)
-//           .attr("height", 10)
-//           .attr("fill", colorScale(range));
-//     legend.append("text")
-//           .attr("x", 15)
-//           .attr("y", i * 20 + 10)
-//           .text(range)
-//           .attr("font-size", "12px")
-//           .attr("fill", "black");
-//   });
-// }
+
+
+
+
+
+function updateVo2Chart() {
+  const svg = d3.select("#vo2-chart svg");
+  const width = +svg.attr("width");
+  const height = +svg.attr("height");
+  svg.selectAll("*").remove();
+  const margin = { top: 20, right: 20, bottom: 40, left: 50 };
+  if (vo2RunningData.length === 0) return;
+
+  const xScale = d3
+    .scaleLinear()
+    .domain(d3.extent(vo2RunningData, d => d.bet))
+    .range([margin.left, width - margin.right]);
+  let yMin = Infinity,
+    yMax = -Infinity;
+  vo2RunningData.forEach(d => {
+    ageRanges.forEach(range => {
+      yMin = Math.min(yMin, d[range] || 0);
+      yMax = Math.max(yMax, d[range] || 0);
+    });
+  });
+  const yScale = d3
+    .scaleLinear()
+    .domain([yMin - 10, yMax + 10])
+    .range([height - margin.bottom, margin.top]);
+
+  // Draw axes.
+  const xAxis = d3.axisBottom(xScale);
+  svg.append("g")
+     .attr("transform", `translate(0, ${height - margin.bottom})`)
+     .call(xAxis)
+     .append("text")
+     .attr("x", width - margin.right)
+     .attr("y", -10)
+     .attr("fill", "black")
+     .style("text-anchor", "end")
+     .text("Bet Number");
+
+  const yAxis = d3.axisLeft(yScale);
+  svg.append("g")
+     .attr("transform", `translate(${margin.left}, 0)`)
+     .call(yAxis)
+     .append("text")
+     .attr("x", 5)
+     .attr("y", margin.top)
+     .attr("fill", "black")
+     .text("VO₂ Running Total");
+
+  const colorScale = d3
+    .scaleOrdinal()
+    .domain(ageRanges)
+    .range(["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd"]);
+
+  ageRanges.forEach(range => {
+    const line = d3
+      .line()
+      .x(d => xScale(d.bet))
+      .y(d => yScale(d[range] || 0))
+      .curve(d3.curveMonotoneX);
+    svg.append("path")
+       .datum(vo2RunningData)
+       .attr("fill", "none")
+       .attr("stroke", colorScale(range))
+       .attr("stroke-width", 2)
+       .attr("d", line);
+  });
+
+  // Add a legend.
+  const legend = svg
+    .append("g")
+    .attr("transform", `translate(${width - margin.right - 100}, ${margin.top})`);
+  ageRanges.forEach((range, i) => {
+    legend.append("rect")
+          .attr("x", 0)
+          .attr("y", i * 20)
+          .attr("width", 10)
+          .attr("height", 10)
+          .attr("fill", colorScale(range));
+    legend.append("text")
+          .attr("x", 15)
+          .attr("y", i * 20 + 10)
+          .text(range)
+          .attr("font-size", "12px")
+          .attr("fill", "black");
+  });
+}
 
 /***********************
  * Place Bet Function
@@ -1348,150 +1499,3 @@ document.addEventListener("mousemove", function (event) {
 });
 
 updateParticipants();
-
-
-
-
-
-
-
-
-
-const ageRunningData = {};
-ageRanges.forEach(range => {
-    ageRunningData[range] = { sum: 0, count: 0 };
-});
-
-
-
-ageRunningData[p1Data.Age_Range].sum += p1Data.VO2;
-ageRunningData[p1Data.Age_Range].count++;
-ageRunningData[p2Data.Age_Range].sum += p2Data.VO2;
-ageRunningData[p2Data.Age_Range].count++;
-
-
-const snapshot = { bet: betHistory.length };
-ageRanges.forEach(range => {
-    snapshot[range] = ageRunningData[range].count > 0 
-        ? ageRunningData[range].sum / ageRunningData[range].count 
-        : null;
-});
-vo2RunningData.push(snapshot);
-
-
-
-function updateVo2Chart() {
-  const svg = d3.select("#vo2-chart svg");
-  const width = +svg.attr("width");
-  const height = +svg.attr("height");
-  svg.selectAll("*").remove();
-  const margin = { top: 20, right: 20, bottom: 40, left: 50 };
-  if (vo2RunningData.length === 0) return;
-
-  const xScale = d3
-    .scaleLinear()
-    .domain(d3.extent(vo2RunningData, d => d.bet))
-    .range([margin.left, width - margin.right]);
-  let yMin = Infinity,
-    yMax = -Infinity;
-  vo2RunningData.forEach(d => {
-    ageRanges.forEach(range => {
-      yMin = Math.min(yMin, d[range] || 0);
-      yMax = Math.max(yMax, d[range] || 0);
-    });
-  });
-  // const yScale = d3
-  //   .scaleLinear()
-  //   .domain([yMin - 10, yMax + 10])
-  //   .range([height - margin.bottom, margin.top]);
-
-  const yScale = d3
-        .scaleLinear()
-        .domain([0, d3.max(vo2RunningData, d => 
-            Math.max(...ageRanges.map(range => d[range] || 0))
-        )])
-        .range([height - margin.bottom, margin.top]);
-
-
-
-  // Draw axes.
-  const xAxis = d3.axisBottom(xScale);
-  svg.append("g")
-     .attr("transform", `translate(0, ${height - margin.bottom})`)
-     .call(xAxis)
-     .append("text")
-     .attr("x", width - margin.right)
-     .attr("y", -10)
-     .attr("fill", "black")
-     .style("text-anchor", "end")
-     .text("Bet Number");
-
-  const yAxis = d3.axisLeft(yScale);
-  svg.append("g")
-     .attr("transform", `translate(${margin.left}, 0)`)
-     .call(yAxis)
-     .append("text")
-     .attr("x", 5)
-     .attr("y", margin.top)
-     .attr("fill", "black")
-     .text("VO₂ Running Total");
-
-  const colorScale = d3
-    .scaleOrdinal()
-    .domain(ageRanges)
-    .range(["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd"]);
-
-  // ageRanges.forEach(range => {
-  //   const line = d3
-  //     .line()
-  //     .x(d => xScale(d.bet))
-  //     .y(d => yScale(d[range] || 0))
-  //     .curve(d3.curveMonotoneX);
-  //   svg.append("path")
-  //      .datum(vo2RunningData)
-  //      .attr("fill", "none")
-  //      .attr("stroke", colorScale(range))
-  //      .attr("stroke-width", 2)
-  //      .attr("d", line);
-  // });
-
-  ageRanges.forEach(range => {
-    const line = d3
-        .line()
-        .x(d => xScale(d.bet))
-        .y(d => d[range] ? yScale(d[range]) : yScale(0))
-        .defined(d => d[range] !== null)
-        .curve(d3.curveMonotoneX);
-
-    svg.append("path")
-        .datum(vo2RunningData)
-        .attr("fill", "none")
-        .attr("stroke", colorScale(range))
-        .attr("stroke-width", 2)
-        .attr("d", line);
-  });
-
-
-
-  // Add a legend.
-  const legend = svg
-    .append("g")
-    .attr("transform", `translate(${width - margin.right - 100}, ${margin.top})`);
-  ageRanges.forEach((range, i) => {
-    legend.append("rect")
-          .attr("x", 0)
-          .attr("y", i * 20)
-          .attr("width", 10)
-          .attr("height", 10)
-          .attr("fill", colorScale(range));
-    legend.append("text")
-          .attr("x", 15)
-          .attr("y", i * 20 + 10)
-          .text(range)
-          .attr("font-size", "12px")
-          .attr("fill", "black");
-  });
-
-  svg.select(".y-axis-label")
-        .text("VO₂ Running Average");
-}
