@@ -1030,150 +1030,7 @@ function updateBarChart() {
      .attr("height", d => Math.abs(yScale(d.earningsChange) - yScale(0)));
 }
 
-// // 2. Cumulative Earnings Line Chart (Second Graph)
-// function updateLineChart(xDomainOverride) {
-//   const svg = d3.select("#line-chart svg");
-//   const width = +svg.attr("width");
-//   const height = +svg.attr("height");
-//   svg.selectAll("*").remove();
-
-//   const margin = { top: 20, right: 20, bottom: 40, left: 50 };
-//   let cumulativeData = [];
-//   let sum = 0;
-//   betHistory.forEach(d => {
-//     sum += d.earningsChange;
-//     cumulativeData.push({ bet: d.betNumber, earnings: sum });
-//   });
-//   if (cumulativeData.length === 0) return;
-
-//   const totalBets = cumulativeData.length;
-//   let xDomainStart = totalBets > 15 ? totalBets - 14 : 1;
-//   let xDomainEnd = totalBets;
-//   if (xDomainOverride) {
-//     [xDomainStart, xDomainEnd] = xDomainOverride;
-//   }
-
-//   const xScale = d3
-//     .scaleLinear()
-//     .domain([xDomainStart, xDomainEnd])
-//     .range([margin.left, width - margin.right]);
-//   const yMin = d3.min(cumulativeData, d => d.earnings);
-//   const yMax = d3.max(cumulativeData, d => d.earnings);
-//   const yScale = d3
-//     .scaleLinear()
-//     .domain([yMin - 10, yMax + 10])
-//     .range([height - margin.bottom, margin.top]);
-
-//   const xAxis = d3.axisBottom(xScale).ticks(Math.min(15, totalBets));
-//   svg.append("g")
-//      .attr("transform", `translate(0, ${height - margin.bottom})`)
-//      .call(xAxis)
-//      .append("text")
-//      .attr("x", width - margin.right)
-//      .attr("y", -10)
-//      .attr("fill", "black")
-//      .style("text-anchor", "end")
-//      .text("Bet Number");
-
-//   const yAxis = d3.axisLeft(yScale);
-//   svg.append("g")
-//      .attr("transform", `translate(${margin.left}, 0)`)
-//      .call(yAxis)
-//      .append("text")
-//      .attr("transform", "rotate(-90)")
-//      .attr("x", -height / 2)
-//      .attr("y", -margin.left + 15)
-//      .attr("fill", "black")
-//      .style("text-anchor", "middle")
-//      .text("Cumulative Earnings ($)");
-
-//   svg.append("line")
-//      .attr("x1", margin.left)
-//      .attr("x2", width - margin.right)
-//      .attr("y1", yScale(0))
-//      .attr("y2", yScale(0))
-//      .attr("stroke", "#555")
-//      .attr("stroke-dasharray", "4");
-
-//   for (let i = 0; i < cumulativeData.length - 1; i++) {
-//     if (cumulativeData[i].bet < xDomainStart) continue;
-//     const d1 = cumulativeData[i],
-//       d2 = cumulativeData[i + 1];
-//     function drawSegment(x1, y1, x2, y2, color) {
-//       svg.append("line")
-//          .attr("x1", xScale(x1))
-//          .attr("y1", yScale(y1))
-//          .attr("x2", xScale(x2))
-//          .attr("y2", yScale(y2))
-//          .attr("stroke", color)
-//          .attr("stroke-width", 2);
-//     }
-//     if (
-//       (d1.earnings >= 0 && d2.earnings >= 0) ||
-//       (d1.earnings < 0 && d2.earnings < 0)
-//     ) {
-//       const segColor = d1.earnings >= 0 ? "green" : "red";
-//       drawSegment(d1.bet, d1.earnings, d2.bet, d2.earnings, segColor);
-//     } else {
-//       const t =
-//         d1.bet +
-//         ((d2.bet - d1.bet) * d1.earnings) / (d1.earnings - d2.earnings);
-//       const color1 = d1.earnings >= 0 ? "green" : "red";
-//       drawSegment(d1.bet, d1.earnings, t, 0, color1);
-//       const color2 = d2.earnings >= 0 ? "green" : "red";
-//       drawSegment(t, 0, d2.bet, d2.earnings, color2);
-//     }
-//   }
-//   svg.selectAll("circle")
-//      .data(cumulativeData)
-//      .enter()
-//      .append("circle")
-//      .attr("id", d => "circle-bet-" + d.bet)
-//      .attr("cx", d => xScale(d.bet))
-//      .attr("cy", d => yScale(d.earnings))
-//      .attr("r", 4)
-//      .attr("fill", "white")
-//      .attr("stroke", "black")
-//      .attr("stroke-width", 1)
-//      .on("mouseover", function (event, d) {
-//        d3.select("#tooltip")
-//          .style("display", "block")
-//          .html(`Bet #: ${d.bet}<br>Cumulative: $${d.earnings}`);
-//      })
-//      .on("mouseout", function () {
-//        d3.select("#tooltip").style("display", "none");
-//      });
-
-//   const brush = d3
-//     .brushX()
-//     .extent([
-//       [margin.left, margin.top],
-//       [width - margin.right, height - margin.bottom]
-//     ])
-//     .on("end", brushed);
-//   svg.append("g").attr("class", "brush").call(brush);
-
-//   function brushed({ selection }) {
-//     if (!selection) {
-//       updateLineChart([xDomainStart, xDomainEnd]);
-//       return;
-//     }
-//     const [x0, x1] = selection;
-//     const newDomain = [
-//       Math.round(xScale.invert(x0)),
-//       Math.round(xScale.invert(x1))
-//     ];
-//     svg.select(".brush").call(brush.move, null);
-//     updateLineChart(newDomain);
-//   }
-// }
-
-
-
-
-
-
-
+// 2. Cumulative Earnings Line Chart (Second Graph)
 function updateLineChart(xDomainOverride) {
   const svg = d3.select("#line-chart svg");
   const width = +svg.attr("width");
@@ -1181,17 +1038,16 @@ function updateLineChart(xDomainOverride) {
   svg.selectAll("*").remove();
 
   const margin = { top: 20, right: 20, bottom: 40, left: 50 };
-  if (!betHistory || betHistory.length === 0) return;
-
   let cumulativeData = [];
   let sum = 0;
   betHistory.forEach(d => {
     sum += d.earningsChange;
     cumulativeData.push({ bet: d.betNumber, earnings: sum });
   });
+  if (cumulativeData.length === 0) return;
 
   const totalBets = cumulativeData.length;
-  let xDomainStart = Math.max(1, totalBets - 14);
+  let xDomainStart = totalBets > 15 ? totalBets - 14 : 1;
   let xDomainEnd = totalBets;
   if (xDomainOverride) {
     [xDomainStart, xDomainEnd] = xDomainOverride;
@@ -1200,16 +1056,13 @@ function updateLineChart(xDomainOverride) {
   const xScale = d3
     .scaleLinear()
     .domain([xDomainStart, xDomainEnd])
-    .range([margin.left, width - margin.right])
-    .clamp(true);
-
+    .range([margin.left, width - margin.right]);
   const yMin = d3.min(cumulativeData, d => d.earnings);
   const yMax = d3.max(cumulativeData, d => d.earnings);
   const yScale = d3
     .scaleLinear()
     .domain([yMin - 10, yMax + 10])
-    .range([height - margin.bottom, margin.top])
-    .nice();
+    .range([height - margin.bottom, margin.top]);
 
   const xAxis = d3.axisBottom(xScale).ticks(Math.min(15, totalBets));
   svg.append("g")
@@ -1242,28 +1095,35 @@ function updateLineChart(xDomainOverride) {
      .attr("stroke", "#555")
      .attr("stroke-dasharray", "4");
 
-  function drawSegment(x1, y1, x2, y2, color) {
-    svg.append("line")
-       .attr("x1", xScale(x1))
-       .attr("y1", yScale(y1))
-       .attr("x2", xScale(x2))
-       .attr("y2", yScale(y2))
-       .attr("stroke", color)
-       .attr("stroke-width", 2);
-  }
-
   for (let i = 0; i < cumulativeData.length - 1; i++) {
     if (cumulativeData[i].bet < xDomainStart) continue;
-    const d1 = cumulativeData[i], d2 = cumulativeData[i + 1];
-    if ((d1.earnings >= 0 && d2.earnings >= 0) || (d1.earnings < 0 && d2.earnings < 0)) {
-      drawSegment(d1.bet, d1.earnings, d2.bet, d2.earnings, d1.earnings >= 0 ? "green" : "red");
+    const d1 = cumulativeData[i],
+      d2 = cumulativeData[i + 1];
+    function drawSegment(x1, y1, x2, y2, color) {
+      svg.append("line")
+         .attr("x1", xScale(x1))
+         .attr("y1", yScale(y1))
+         .attr("x2", xScale(x2))
+         .attr("y2", yScale(y2))
+         .attr("stroke", color)
+         .attr("stroke-width", 2);
+    }
+    if (
+      (d1.earnings >= 0 && d2.earnings >= 0) ||
+      (d1.earnings < 0 && d2.earnings < 0)
+    ) {
+      const segColor = d1.earnings >= 0 ? "green" : "red";
+      drawSegment(d1.bet, d1.earnings, d2.bet, d2.earnings, segColor);
     } else {
-      const t = d1.bet + ((d2.bet - d1.bet) * d1.earnings) / (d1.earnings - d2.earnings);
-      drawSegment(d1.bet, d1.earnings, t, 0, d1.earnings >= 0 ? "green" : "red");
-      drawSegment(t, 0, d2.bet, d2.earnings, d2.earnings >= 0 ? "green" : "red");
+      const t =
+        d1.bet +
+        ((d2.bet - d1.bet) * d1.earnings) / (d1.earnings - d2.earnings);
+      const color1 = d1.earnings >= 0 ? "green" : "red";
+      drawSegment(d1.bet, d1.earnings, t, 0, color1);
+      const color2 = d2.earnings >= 0 ? "green" : "red";
+      drawSegment(t, 0, d2.bet, d2.earnings, color2);
     }
   }
-
   svg.selectAll("circle")
      .data(cumulativeData)
      .enter()
@@ -1295,7 +1155,7 @@ function updateLineChart(xDomainOverride) {
 
   function brushed({ selection }) {
     if (!selection) {
-      updateLineChart();
+      updateLineChart([xDomainStart, xDomainEnd]);
       return;
     }
     const [x0, x1] = selection;
@@ -1307,17 +1167,6 @@ function updateLineChart(xDomainOverride) {
     updateLineChart(newDomain);
   }
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 function updateVo2Chart() {
@@ -1344,6 +1193,11 @@ function updateVo2Chart() {
     .scaleLinear()
     .domain([yMin - 10, yMax + 10])
     .range([height - margin.bottom, margin.top]);
+
+
+
+
+
 
   // Draw axes.
   const xAxis = d3.axisBottom(xScale);
@@ -1405,6 +1259,10 @@ function updateVo2Chart() {
           .attr("fill", "black");
   });
 }
+
+
+
+
 
 /***********************
  * Place Bet Function
@@ -1498,4 +1356,22 @@ document.addEventListener("mousemove", function (event) {
     .style("top", event.pageY + 15 + "px");
 });
 
+
+
+function setVO2Opacity(participantId, opacityLevel) {
+  const vo2Element = document.querySelector(`#${participantId} p:first-of-type`);
+  if (vo2Element) {
+      vo2Element.style.opacity = opacityLevel;
+  }
+}
+
+// Example usage:
+setVO2Opacity("participant1", 0.0); // Set 50% opacity for Participant 1's VO2 Level
+setVO2Opacity("participant2", 0.0); // Set 20% opacity for Participant 2's VO2 Level
+
+
+
 updateParticipants();
+
+
+
