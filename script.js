@@ -1,12 +1,10 @@
-/***********************
- * Data and Global Variables
- ***********************/
+
 const data = [
-    // { ID: 1, time: 500, VO2: 1705.0, Age_Range: "30-39" },
-    // { ID: 2, time: 501, VO2: 2262.0, Age_Range: "30-39" },
-    // { ID: 3, time: 500, VO2: 2615.0, Age_Range: "10-19" },
-    // { ID: 4, time: 500, VO2: 3120.0, Age_Range: "20-29" }
-//   ];
+  //   { ID: 1, time: 500, VO2: 1705.0, Age_Range: "30-39" },
+  //   { ID: 2, time: 501, VO2: 2262.0, Age_Range: "30-39" },
+  //   { ID: 3, time: 500, VO2: 2615.0, Age_Range: "10-19" },
+  //   { ID: 4, time: 500, VO2: 3120.0, Age_Range: "20-29" }
+  // ];
 
     { ID: 1, time: 500, VO2: 1705.0, Age_Range: '30-39' },
     { ID: 2, time: 501, VO2: 2262.0, Age_Range: '30-39' },
@@ -590,6 +588,7 @@ const data = [
     { ID: 593, time: 500, VO2: 1935.0, Age_Range: '50-59' },
     { ID: 594, time: 501, VO2: 2316.0, Age_Range: '30-39' },
     { ID: 595, time: 500, VO2: 2084.0, Age_Range: '20-29' },
+
     { ID: 597, time: 501, VO2: 2219.0, Age_Range: '50-59' },
     { ID: 598, time: 501, VO2: 2051.0, Age_Range: '50-59' },
     { ID: 599, time: 500, VO2: 2500.0, Age_Range: '50-59' },
@@ -872,386 +871,627 @@ const data = [
       "50-59": { "40-49": "-153", "50-59": "+123" }
     }
   };
-  
+    
   let earnings = 0;
-  const betHistory = [];
-  let filteredBarData = [];
-  
-  // For the VO2 Running Totals chart.
-  const ageRanges = Array.from(new Set(data.map(d => d.Age_Range)));
-  const ageRunningTotals = {};
-  ageRanges.forEach(range => ageRunningTotals[range] = 0);
-  const vo2RunningData = [];
-  
-  /***********************
-   * Helper Functions
-   ***********************/
-  function getClosestVO2(participantId) {
-    return data.find(d => d.ID === participantId) || null;
-  }
-  
-  function getRandomParticipants() {
-    const p1 = Math.floor(Math.random() * data.length) + 1;
-    let p2 = Math.floor(Math.random() * data.length) + 1;
-    while (p2 === p1) {
-      p2 = Math.floor(Math.random() * data.length) + 1;
-    }
-    return [p1, p2];
-  }
-  
-  function getOdds(age1, age2) {
-    if (oddsData[age1] && oddsData[age1][age2]) {
-      return oddsData[age1][age2];
-    } else if (oddsData[age2] && oddsData[age2][age1]) {
-      return oddsData[age2][age1];
-    }
-    return null;
-  }
-  
-  /***********************
-   * Update Functions
-   ***********************/
-  function updateParticipants() {
-    const [p1Id, p2Id] = getRandomParticipants();
-    const p1Data = getClosestVO2(p1Id);
-    const p2Data = getClosestVO2(p2Id);
-  
-    // Update VO2, Age, and Odds display.
-    document.getElementById("vo2-1").textContent = p1Data.VO2;
-    document.getElementById("vo2-2").textContent = p2Data.VO2;
-    document.getElementById("age-1").textContent = p1Data.Age_Range;
-    document.getElementById("age-2").textContent = p2Data.Age_Range;
-  
-    const odds = getOdds(p1Data.Age_Range, p2Data.Age_Range);
-    if (odds) {
-      document.getElementById("odds-1").textContent = odds[p1Data.Age_Range];
-      document.getElementById("odds-2").textContent = odds[p2Data.Age_Range];
-    } else {
-      document.getElementById("odds-1").textContent = "-105";
-      document.getElementById("odds-2").textContent = "-105";
-    }
-    return [p1Id, p2Id, p1Data.VO2, p2Data.VO2, p1Data, p2Data];
-  }
-  
-  function updateFilteredBarData() {
-    const showP1 = document.getElementById("filter-participant1").checked;
-    const showP2 = document.getElementById("filter-participant2").checked;
-    filteredBarData = betHistory.filter(d =>
-      (d.participant === "1" && showP1) || (d.participant === "2" && showP2)
-    );
-  }
-  
-  /***********************
-   * Chart Update Functions
-   ***********************/
-  function updateBarChart() {
-    updateFilteredBarData();
-    const svg = d3.select("#chart svg");
-    const width = +svg.attr("width");
-    const height = +svg.attr("height");
-    svg.selectAll("*").remove();
-  
-    const marginLeft = 50, marginBottom = 30;
-    const displayData = filteredBarData.length > 15 ? filteredBarData.slice(filteredBarData.length - 15) : filteredBarData;
-    const maxVal = d3.max(displayData, d => Math.abs(d.earningsChange)) || 1;
-    const yScale = d3.scaleLinear()
-                     .domain([-maxVal, maxVal])
-                     .range([height - marginBottom, 20]);
-  
-    svg.append("g")
-       .attr("transform", `translate(${marginLeft},0)`)
-       .call(d3.axisLeft(yScale));
-  
-    const xScale = d3.scaleBand()
-                     .domain(displayData.map((d, i) => i))
-                     .range([marginLeft + 10, width - 10])
-                     .padding(0.1);
-  
-    svg.append("g")
-       .attr("transform", `translate(0, ${height - marginBottom})`)
-       .call(d3.axisBottom(xScale)
-               .tickFormat((d, i) => {
-                 const overallNum = filteredBarData.length > 15 ? d + filteredBarData.length - 15 + 1 : d + 1;
-                 return overallNum;
-               }));
-  
-    svg.selectAll("rect")
-       .data(displayData, d => d.betNumber)
-       .enter()
-       .append("rect")
-       .attr("x", (d, i) => xScale(i))
-       .attr("width", xScale.bandwidth())
-       .attr("y", yScale(0))
-       .attr("height", 0)
-       .attr("fill", d => d.earningsChange >= 0 ? "green" : "red")
-       .on("mouseover", function(event, d) {
-          d3.select("#tooltip")
-            .style("display", "block")
-            .html(`Bet #: ${d.betNumber}<br>Participant: ${d.participant}<br>Bet Amount: $${d.betAmount}<br>Result: ${d.earningsChange >= 0 ? "Win" : "Loss"} ($${d.earningsChange})`);
-       })
-       .on("mouseout", function() {
-          d3.select("#tooltip").style("display", "none");
-       })
-       .transition().duration(500)
-       .attr("y", d => d.earningsChange >= 0 ? yScale(d.earningsChange) : yScale(0))
-       .attr("height", d => Math.abs(yScale(d.earningsChange) - yScale(0)));
-  }
-  
-  function updateLineChart(xDomainOverride) {
-    const svg = d3.select("#line-chart svg");
-    const width = +svg.attr("width");
-    const height = +svg.attr("height");
-    svg.selectAll("*").remove();
-  
-    const margin = { top: 20, right: 20, bottom: 40, left: 50 };
-    let cumulativeData = [];
-    let sum = 0;
-    betHistory.forEach(d => {
-      sum += d.earningsChange;
-      cumulativeData.push({ bet: d.betNumber, earnings: sum });
-    });
-    if (cumulativeData.length === 0) return;
-  
-    const totalBets = cumulativeData.length;
-    let xDomainStart = totalBets > 15 ? totalBets - 14 : 1;
-    let xDomainEnd = totalBets;
-    if (xDomainOverride) { [xDomainStart, xDomainEnd] = xDomainOverride; }
-  
-    const xScale = d3.scaleLinear()
-                     .domain([xDomainStart, xDomainEnd])
-                     .range([margin.left, width - margin.right]);
-    const yMin = d3.min(cumulativeData, d => d.earnings);
-    const yMax = d3.max(cumulativeData, d => d.earnings);
-    const yScale = d3.scaleLinear()
-                     .domain([yMin - 10, yMax + 10])
-                     .range([height - margin.bottom, margin.top]);
-  
-    const xAxis = d3.axisBottom(xScale).ticks(Math.min(15, totalBets));
-    svg.append("g")
-       .attr("transform", `translate(0, ${height - margin.bottom})`)
-       .call(xAxis)
-       .append("text")
-       .attr("x", width - margin.right)
-       .attr("y", -10)
-       .attr("fill", "black")
-       .style("text-anchor", "end")
-       .text("Bet Number");
-  
-    const yAxis = d3.axisLeft(yScale);
-    // svg.append("g")
-    //    .attr("transform", `translate(${margin.left}, 0)`)
-    //    .call(yAxis)
-    //    .append("text")
-    //    .attr("x", 5)
-    //    .attr("y", margin.top)
-    //    .attr("fill", "black")
-    //    .text("Cumulative Earnings");
+const betHistory = [];
+let filteredBarData = [];
 
-    svg.append("g")
-        .attr("transform", `translate(${margin.left}, 0)`)
-        .call(yAxis)
-        .append("text")
-        .attr("transform", "rotate(-90)")  // Rotate text for better alignment
-        .attr("x", -height / 2)  // Center text along the y-axis
-        .attr("y", -margin.left + 15)  // Adjust position to prevent cutoff
-        .attr("fill", "black")
-        .style("text-anchor", "middle")
-        .text("Cumulative Earnings ($)");
-  
-    svg.append("line")
-       .attr("x1", margin.left)
-       .attr("x2", width - margin.right)
-       .attr("y1", yScale(0))
-       .attr("y2", yScale(0))
-       .attr("stroke", "#555")
-       .attr("stroke-dasharray", "4");
-  
-    for (let i = 0; i < cumulativeData.length - 1; i++) {
-      if (cumulativeData[i].bet < xDomainStart) continue;
-      const d1 = cumulativeData[i], d2 = cumulativeData[i+1];
-      function drawSegment(x1, y1, x2, y2, color) {
-        svg.append("line")
-           .attr("x1", xScale(x1))
-           .attr("y1", yScale(y1))
-           .attr("x2", xScale(x2))
-           .attr("y2", yScale(y2))
-           .attr("stroke", color)
-           .attr("stroke-width", 2);
-      }
-      if ((d1.earnings >= 0 && d2.earnings >= 0) || (d1.earnings < 0 && d2.earnings < 0)) {
-        const segColor = d1.earnings >= 0 ? "green" : "red";
-        drawSegment(d1.bet, d1.earnings, d2.bet, d2.earnings, segColor);
-      } else {
-        const t = d1.bet + (d2.bet - d1.bet) * (d1.earnings / (d1.earnings - d2.earnings));
-        const color1 = d1.earnings >= 0 ? "green" : "red";
-        drawSegment(d1.bet, d1.earnings, t, 0, color1);
-        const color2 = d2.earnings >= 0 ? "green" : "red";
-        drawSegment(t, 0, d2.bet, d2.earnings, color2);
-      }
+// For VO₂ running totals based on bets.
+const ageRanges = Array.from(new Set(data.map(d => d.Age_Range)));
+const ageRunningTotals = {};
+ageRanges.forEach(range => (ageRunningTotals[range] = 0));
+const vo2RunningData = [];
+
+/***********************
+ * Helper Functions
+ ***********************/
+function getClosestVO2(participantId) {
+  return data.find(d => d.ID === participantId) || null;
+}
+
+function getRandomParticipants() {
+  const p1 = Math.floor(Math.random() * data.length) + 1;
+  let p2 = Math.floor(Math.random() * data.length) + 1;
+  while (p2 === p1) {
+    p2 = Math.floor(Math.random() * data.length) + 1;
+  }
+  return [p1, p2];
+}
+
+function getOdds(age1, age2) {
+  if (oddsData[age1] && oddsData[age1][age2]) {
+    return oddsData[age1][age2];
+  } else if (oddsData[age2] && oddsData[age2][age1]) {
+    return oddsData[age2][age1];
+  }
+  return null;
+}
+
+/***********************
+ * Update Functions
+ ***********************/
+function updateParticipants() {
+  const [p1Id, p2Id] = getRandomParticipants();
+  const p1Data = getClosestVO2(p1Id);
+  const p2Data = getClosestVO2(p2Id);
+
+  // Update VO₂, Age, and Odds display.
+  document.getElementById("vo2-1").textContent = p1Data.VO2;
+  document.getElementById("vo2-2").textContent = p2Data.VO2;
+  document.getElementById("age-1").textContent = p1Data.Age_Range;
+  document.getElementById("age-2").textContent = p2Data.Age_Range;
+
+  const odds = getOdds(p1Data.Age_Range, p2Data.Age_Range);
+  if (odds) {
+    document.getElementById("odds-1").textContent = odds[p1Data.Age_Range];
+    document.getElementById("odds-2").textContent = odds[p2Data.Age_Range];
+  } else {
+    document.getElementById("odds-1").textContent = "-105";
+    document.getElementById("odds-2").textContent = "-105";
+  }
+  return [p1Id, p2Id, p1Data.VO2, p2Data.VO2, p1Data, p2Data];
+}
+
+function updateFilteredBarData() {
+  const showP1 = document.getElementById("filter-participant1").checked;
+  const showP2 = document.getElementById("filter-participant2").checked;
+  filteredBarData = betHistory.filter(
+    d => (d.participant === "1" && showP1) || (d.participant === "2" && showP2)
+  );
+}
+
+/***********************
+ * Chart Update Functions
+ ***********************/
+// 1. Bet History Bar Chart (First Graph)
+//    Now shows "Bet Number" (x-axis) and "Amount Won" (y-axis).
+function updateBarChart() {
+  updateFilteredBarData();
+  const svg = d3.select("#chart svg");
+  const width = +svg.attr("width");
+  const height = +svg.attr("height");
+  svg.selectAll("*").remove();
+
+  const marginLeft = 50,
+    marginBottom = 30;
+  const displayData =
+    filteredBarData.length > 15
+      ? filteredBarData.slice(filteredBarData.length - 15)
+      : filteredBarData;
+  const maxVal = d3.max(displayData, d => Math.abs(d.earningsChange)) || 1;
+  const yScale = d3
+    .scaleLinear()
+    .domain([-maxVal, maxVal])
+    .range([height - marginBottom, 20]);
+
+  // Draw y-axis.
+  const yAxis = d3.axisLeft(yScale);
+  svg.append("g")
+     .attr("transform", `translate(${marginLeft},0)`)
+     .call(yAxis);
+  // Y-axis label.
+  svg.append("text")
+     .attr("transform", "rotate(-90)")
+     .attr("x", -height / 2)
+     .attr("y", 15)
+     .attr("text-anchor", "middle")
+     .text("Amount Won");
+
+  const xScale = d3
+    .scaleBand()
+    .domain(displayData.map((d, i) => i))
+    .range([marginLeft + 10, width - 10])
+    .padding(0.1);
+
+  // Draw x-axis.
+  const xAxis = d3.axisBottom(xScale).tickFormat((d, i) => {
+    const overallNum =
+      filteredBarData.length > 15
+        ? d + filteredBarData.length - 15 + 1
+        : d + 1;
+    return overallNum;
+  });
+  svg.append("g")
+     .attr("transform", `translate(0, ${height - marginBottom})`)
+     .call(xAxis);
+  // X-axis label.
+  svg.append("text")
+     .attr("x", width / 2)
+     .attr("y", height - 5)
+     .attr("text-anchor", "middle")
+     .text("Bet Number");
+
+  svg.selectAll("rect")
+     .data(displayData, d => d.betNumber)
+     .enter()
+     .append("rect")
+     .attr("x", (d, i) => xScale(i))
+     .attr("width", xScale.bandwidth())
+     .attr("y", yScale(0))
+     .attr("height", 0)
+     .attr("fill", d => (d.earningsChange >= 0 ? "green" : "red"))
+     .on("mouseover", function (event, d) {
+       d3.select("#tooltip")
+         .style("display", "block")
+         .html(
+           `Bet #: ${d.betNumber}<br>Participant: ${d.participant}<br>Bet Amount: $${d.betAmount}<br>Result: ${
+             d.earningsChange >= 0 ? "Win" : "Loss"
+           } ($${d.earningsChange})`
+         );
+     })
+     .on("mouseout", function () {
+       d3.select("#tooltip").style("display", "none");
+     })
+     .transition()
+     .duration(500)
+     .attr("y", d =>
+       d.earningsChange >= 0 ? yScale(d.earningsChange) : yScale(0)
+     )
+     .attr("height", d => Math.abs(yScale(d.earningsChange) - yScale(0)));
+}
+
+// 2. Cumulative Earnings Line Chart (Second Graph)
+function updateLineChart(xDomainOverride) {
+  const svg = d3.select("#line-chart svg");
+  const width = +svg.attr("width");
+  const height = +svg.attr("height");
+  svg.selectAll("*").remove();
+
+  const margin = { top: 20, right: 20, bottom: 40, left: 50 };
+  let cumulativeData = [];
+  let sum = 0;
+  betHistory.forEach(d => {
+    sum += d.earningsChange;
+    cumulativeData.push({ bet: d.betNumber, earnings: sum });
+  });
+  if (cumulativeData.length === 0) return;
+
+  const totalBets = cumulativeData.length;
+  let xDomainStart = totalBets > 15 ? totalBets - 14 : 1;
+  let xDomainEnd = totalBets;
+  if (xDomainOverride) {
+    [xDomainStart, xDomainEnd] = xDomainOverride;
+  }
+
+  const xScale = d3
+    .scaleLinear()
+    .domain([xDomainStart, xDomainEnd])
+    .range([margin.left, width - margin.right]);
+  const yMin = d3.min(cumulativeData, d => d.earnings);
+  const yMax = d3.max(cumulativeData, d => d.earnings);
+  const yScale = d3
+    .scaleLinear()
+    .domain([yMin - 10, yMax + 10])
+    .range([height - margin.bottom, margin.top]);
+
+  const xAxis = d3.axisBottom(xScale).ticks(Math.min(15, totalBets));
+  svg.append("g")
+     .attr("transform", `translate(0, ${height - margin.bottom})`)
+     .call(xAxis)
+     .append("text")
+     .attr("x", width - margin.right)
+     .attr("y", -10)
+     .attr("fill", "black")
+     .style("text-anchor", "end")
+     .text("Bet Number");
+
+  const yAxis = d3.axisLeft(yScale);
+  svg.append("g")
+     .attr("transform", `translate(${margin.left}, 0)`)
+     .call(yAxis)
+     .append("text")
+     .attr("transform", "rotate(-90)")
+     .attr("x", -height / 2)
+     .attr("y", -margin.left + 15)
+     .attr("fill", "black")
+     .style("text-anchor", "middle")
+     .text("Cumulative Earnings ($)");
+
+  svg.append("line")
+     .attr("x1", margin.left)
+     .attr("x2", width - margin.right)
+     .attr("y1", yScale(0))
+     .attr("y2", yScale(0))
+     .attr("stroke", "#555")
+     .attr("stroke-dasharray", "4");
+
+  for (let i = 0; i < cumulativeData.length - 1; i++) {
+    if (cumulativeData[i].bet < xDomainStart) continue;
+    const d1 = cumulativeData[i],
+      d2 = cumulativeData[i + 1];
+    function drawSegment(x1, y1, x2, y2, color) {
+      svg.append("line")
+         .attr("x1", xScale(x1))
+         .attr("y1", yScale(y1))
+         .attr("x2", xScale(x2))
+         .attr("y2", yScale(y2))
+         .attr("stroke", color)
+         .attr("stroke-width", 2);
     }
-    svg.selectAll("circle")
-       .data(cumulativeData)
-       .enter()
-       .append("circle")
-       .attr("id", d => "circle-bet-" + d.bet)
-       .attr("cx", d => xScale(d.bet))
-       .attr("cy", d => yScale(d.earnings))
-       .attr("r", 4)
-       .attr("fill", "white")
-       .attr("stroke", "black")
-       .attr("stroke-width", 1)
-       .on("mouseover", function(event, d) {
-          d3.select("#tooltip")
-            .style("display", "block")
-            .html(`Bet #: ${d.bet}<br>Cumulative: $${d.earnings}`);
-       })
-       .on("mouseout", function() {
-          d3.select("#tooltip").style("display", "none");
-       });
-  
-    const brush = d3.brushX()
-                    .extent([[margin.left, margin.top], [width - margin.right, height - margin.bottom]])
-                    .on("end", brushed);
-    svg.append("g")
-       .attr("class", "brush")
-       .call(brush);
-  
-    function brushed({ selection }) {
-      if (!selection) {
-        updateLineChart([xDomainStart, xDomainEnd]);
-        return;
-      }
-      const [x0, x1] = selection;
-      const newDomain = [Math.round(xScale.invert(x0)), Math.round(xScale.invert(x1))];
-      svg.select(".brush").call(brush.move, null);
-      updateLineChart(newDomain);
+    if (
+      (d1.earnings >= 0 && d2.earnings >= 0) ||
+      (d1.earnings < 0 && d2.earnings < 0)
+    ) {
+      const segColor = d1.earnings >= 0 ? "green" : "red";
+      drawSegment(d1.bet, d1.earnings, d2.bet, d2.earnings, segColor);
+    } else {
+      const t =
+        d1.bet +
+        ((d2.bet - d1.bet) * d1.earnings) / (d1.earnings - d2.earnings);
+      const color1 = d1.earnings >= 0 ? "green" : "red";
+      drawSegment(d1.bet, d1.earnings, t, 0, color1);
+      const color2 = d2.earnings >= 0 ? "green" : "red";
+      drawSegment(t, 0, d2.bet, d2.earnings, color2);
     }
   }
-  
-  function updateVo2Chart() {
-    const svg = d3.select("#vo2-chart svg");
-    const width = +svg.attr("width");
-    const height = +svg.attr("height");
-    svg.selectAll("*").remove();
-    const margin = { top: 20, right: 20, bottom: 40, left: 50 };
-    if (vo2RunningData.length === 0) return;
-    const xScale = d3.scaleLinear()
-                     .domain(d3.extent(vo2RunningData, d => d.bet))
-                     .range([margin.left, width - margin.right]);
-    let yMin = Infinity, yMax = -Infinity;
-    vo2RunningData.forEach(d => {
-      ageRanges.forEach(range => {
-        yMin = Math.min(yMin, d[range] || 0);
-        yMax = Math.max(yMax, d[range] || 0);
-      });
-    });
-    const yScale = d3.scaleLinear()
-                     .domain([yMin - 10, yMax + 10])
-                     .range([height - margin.bottom, margin.top]);
-    const xAxis = d3.axisBottom(xScale);
-    svg.append("g")
-       .attr("transform", `translate(0, ${height - margin.bottom})`)
-       .call(xAxis)
-       .append("text")
-       .attr("x", width - margin.right)
-       .attr("y", -10)
-       .attr("fill", "black")
-       .style("text-anchor", "end")
-       .text("Bet Number");
-    const yAxis = d3.axisLeft(yScale);
-    svg.append("g")
-       .attr("transform", `translate(${margin.left}, 0)`)
-       .call(yAxis)
-       .append("text")
-       .attr("x", 5)
-       .attr("y", margin.top)
-       .attr("fill", "black")
-       .text("VO2 Running Total");
-    ageRanges.forEach(range => {
-      const line = d3.line()
-                     .x(d => xScale(d.bet))
-                     .y(d => yScale(d[range] || 0))
-                     .curve(d3.curveMonotoneX);
-      svg.append("path")
-         .datum(vo2RunningData)
-         .attr("fill", "none")
-         .attr("stroke", range === "30-39" ? "blue" : range === "10-19" ? "orange" : "purple")
-         .attr("stroke-width", 2)
-         .attr("d", line);
-    });
-    const legend = svg.append("g")
-                      .attr("transform", `translate(${width - margin.right - 100}, ${margin.top})`);
-    ageRanges.forEach((range, i) => {
-      legend.append("rect")
-            .attr("x", 0)
-            .attr("y", i * 20)
-            .attr("width", 10)
-            .attr("height", 10)
-            .attr("fill", range === "30-39" ? "blue" : range === "10-19" ? "orange" : "purple");
-      legend.append("text")
-            .attr("x", 15)
-            .attr("y", i * 20 + 10)
-            .text(range)
-            .attr("font-size", "12px")
-            .attr("fill", "black");
-    });
-  }
-  
-  /***********************
-   * Place Bet Function
-   ***********************/
-  function placeBet() {
-    const betAmount = parseInt(document.getElementById("bet-amount").value);
-    const betChoiceRadio = document.querySelector('input[name="bet-choice"]:checked');
-    if (!betAmount || !betChoiceRadio) {
-      alert("Please enter a bet amount and select a participant.");
+  svg.selectAll("circle")
+     .data(cumulativeData)
+     .enter()
+     .append("circle")
+     .attr("id", d => "circle-bet-" + d.bet)
+     .attr("cx", d => xScale(d.bet))
+     .attr("cy", d => yScale(d.earnings))
+     .attr("r", 4)
+     .attr("fill", "white")
+     .attr("stroke", "black")
+     .attr("stroke-width", 1)
+     .on("mouseover", function (event, d) {
+       d3.select("#tooltip")
+         .style("display", "block")
+         .html(`Bet #: ${d.bet}<br>Cumulative: $${d.earnings}`);
+     })
+     .on("mouseout", function () {
+       d3.select("#tooltip").style("display", "none");
+     });
+
+  const brush = d3
+    .brushX()
+    .extent([
+      [margin.left, margin.top],
+      [width - margin.right, height - margin.bottom]
+    ])
+    .on("end", brushed);
+  svg.append("g").attr("class", "brush").call(brush);
+
+  function brushed({ selection }) {
+    if (!selection) {
+      updateLineChart([xDomainStart, xDomainEnd]);
       return;
     }
-    const [p1, p2, vo2_1, vo2_2, p1Data, p2Data] = updateParticipants();
-    const betOnParticipant1 = betChoiceRadio.value === "1";
-    const winningParticipant = betOnParticipant1 ? (vo2_1 > vo2_2 ? p1 : p2) : (vo2_2 > vo2_1 ? p2 : p1);
-    const betChosenId = betOnParticipant1 ? p1 : p2;
-    const wonBet = winningParticipant === betChosenId;
-    const resultText = wonBet ? "You win!" : "You lose!";
-    const earningsChange = wonBet ? betAmount : -betAmount;
-    earnings += earningsChange;
-    const betObj = {
-      betNumber: betHistory.length + 1,
-      participant: betChoiceRadio.value,
-      betAmount: betAmount,
-      earningsChange: earningsChange
-    };
-    betHistory.push(betObj);
-    document.getElementById("result").textContent = resultText;
-    document.getElementById("earnings").textContent = `Earnings: $${earnings}`;
-    if (earnings < -10000) {
-      if (confirm("WARNING: Your total losses have exceeded $10,000. Please consider calling the National Gambling Hotline.\n\nWould you like to be redirected to the hotline website?")) {
-        window.open("https://www.cdph.ca.gov/Programs/OPG/Pages/helpline-numbers.aspx#:~:text=If%20gambling%20has%20become%20a,24%2F7%20problem%20gambling%20assistance.", "_blank");
-      }
-    }
-    // Update VO2 running totals.
-    ageRunningTotals[p1Data.Age_Range] += p1Data.VO2;
-    ageRunningTotals[p2Data.Age_Range] += p2Data.VO2;
-    const snapshot = { bet: betHistory.length };
-    ageRanges.forEach(range => {
-      snapshot[range] = ageRunningTotals[range];
-    });
-    vo2RunningData.push(snapshot);
-    updateBarChart();
-    updateLineChart();
-    updateVo2Chart();
+    const [x0, x1] = selection;
+    const newDomain = [
+      Math.round(xScale.invert(x0)),
+      Math.round(xScale.invert(x1))
+    ];
+    svg.select(".brush").call(brush.move, null);
+    updateLineChart(newDomain);
   }
-  
-  /***********************
-   * Global Event Listeners
-   ***********************/
-  document.getElementById("filter-participant1").addEventListener("change", updateBarChart);
-  document.getElementById("filter-participant2").addEventListener("change", updateBarChart);
-  document.addEventListener("mousemove", function(event) {
-    d3.select("#tooltip")
-      .style("left", (event.pageX + 15) + "px")
-      .style("top", (event.pageY + 15) + "px");
+}
+
+
+// function updateVo2Chart() {
+//   const svg = d3.select("#vo2-chart svg");
+//   const width = +svg.attr("width");
+//   const height = +svg.attr("height");
+//   svg.selectAll("*").remove();
+//   const margin = { top: 20, right: 20, bottom: 40, left: 50 };
+//   if (vo2RunningData.length === 0) return;
+
+//   const xScale = d3
+//     .scaleLinear()
+//     .domain(d3.extent(vo2RunningData, d => d.bet))
+//     .range([margin.left, width - margin.right]);
+//   let yMin = Infinity,
+//     yMax = -Infinity;
+//   vo2RunningData.forEach(d => {
+//     ageRanges.forEach(range => {
+//       yMin = Math.min(yMin, d[range] || 0);
+//       yMax = Math.max(yMax, d[range] || 0);
+//     });
+//   });
+//   const yScale = d3
+//     .scaleLinear()
+//     .domain([yMin - 10, yMax + 10])
+//     .range([height - margin.bottom, margin.top]);
+
+//   // Draw axes.
+//   const xAxis = d3.axisBottom(xScale);
+//   svg.append("g")
+//      .attr("transform", `translate(0, ${height - margin.bottom})`)
+//      .call(xAxis)
+//      .append("text")
+//      .attr("x", width - margin.right)
+//      .attr("y", -10)
+//      .attr("fill", "black")
+//      .style("text-anchor", "end")
+//      .text("Bet Number");
+
+//   const yAxis = d3.axisLeft(yScale);
+//   svg.append("g")
+//      .attr("transform", `translate(${margin.left}, 0)`)
+//      .call(yAxis)
+//      .append("text")
+//      .attr("x", 5)
+//      .attr("y", margin.top)
+//      .attr("fill", "black")
+//      .text("VO₂ Running Total");
+
+//   const colorScale = d3
+//     .scaleOrdinal()
+//     .domain(ageRanges)
+//     .range(["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd"]);
+
+//   ageRanges.forEach(range => {
+//     const line = d3
+//       .line()
+//       .x(d => xScale(d.bet))
+//       .y(d => yScale(d[range] || 0))
+//       .curve(d3.curveMonotoneX);
+//     svg.append("path")
+//        .datum(vo2RunningData)
+//        .attr("fill", "none")
+//        .attr("stroke", colorScale(range))
+//        .attr("stroke-width", 2)
+//        .attr("d", line);
+//   });
+
+//   // Add a legend.
+//   const legend = svg
+//     .append("g")
+//     .attr("transform", `translate(${width - margin.right - 100}, ${margin.top})`);
+//   ageRanges.forEach((range, i) => {
+//     legend.append("rect")
+//           .attr("x", 0)
+//           .attr("y", i * 20)
+//           .attr("width", 10)
+//           .attr("height", 10)
+//           .attr("fill", colorScale(range));
+//     legend.append("text")
+//           .attr("x", 15)
+//           .attr("y", i * 20 + 10)
+//           .text(range)
+//           .attr("font-size", "12px")
+//           .attr("fill", "black");
+//   });
+// }
+
+/***********************
+ * Place Bet Function
+ ***********************/
+function placeBet() {
+  const betAmount = parseInt(document.getElementById("bet-amount").value);
+  const betChoiceRadio = document.querySelector('input[name="bet-choice"]:checked');
+  if (!betAmount || !betChoiceRadio) {
+    alert("Please enter a bet amount and select a participant.");
+    return;
+  }
+  const [p1, p2, vo2_1, vo2_2, p1Data, p2Data] = updateParticipants();
+  const betOnParticipant1 = betChoiceRadio.value === "1";
+  const winningParticipant = betOnParticipant1
+    ? (vo2_1 > vo2_2 ? p1 : p2)
+    : (vo2_2 > vo2_1 ? p2 : p1);
+  const betChosenId = betOnParticipant1 ? p1 : p2;
+  const wonBet = winningParticipant === betChosenId;
+  const resultText = wonBet ? "You win!" : "You lose!";
+
+  // Calculate profit based on odds.
+  // Retrieve the displayed odds value.
+  const oddsStr = betChoiceRadio.value === "1"
+    ? document.getElementById("odds-1").textContent
+    : document.getElementById("odds-2").textContent;
+  const oddsNum = parseInt(oddsStr);
+  let profit = 0;
+  if (wonBet) {
+    if (oddsNum > 0) {
+      profit = betAmount * (oddsNum / 100);
+    } else {
+      profit = betAmount * (100 / Math.abs(oddsNum));
+    }
+  } else {
+    profit = -betAmount;
+  }
+
+  const earningsChange = profit;
+  earnings += earningsChange;
+
+  // Record the bet along with the age range of the participant you bet on.
+  const betAgeRange =
+    betChoiceRadio.value === "1" ? p1Data.Age_Range : p2Data.Age_Range;
+  const betObj = {
+    betNumber: betHistory.length + 1,
+    participant: betChoiceRadio.value,
+    betAgeRange: betAgeRange,
+    betAmount: betAmount,
+    earningsChange: earningsChange
+  };
+  betHistory.push(betObj);
+
+  document.getElementById("result").textContent = resultText;
+  document.getElementById("earnings").textContent = `Earnings: $${earnings.toFixed(2)}`;
+  if (earnings < -10000) {
+    if (
+      confirm(
+        "WARNING: Your total losses have exceeded $10,000. Please consider calling the National Gambling Hotline.\n\nWould you like to be redirected to the hotline website?"
+      )
+    ) {
+      window.open(
+        "https://www.cdph.ca.gov/Programs/OPG/Pages/helpline-numbers.aspx#:~:text=If%20gambling%20has%20become%20a,24%2F7%20problem%20gambling%20assistance.",
+        "_blank"
+      );
+    }
+  }
+  // Update VO₂ running totals.
+  ageRunningTotals[p1Data.Age_Range] += p1Data.VO2;
+  ageRunningTotals[p2Data.Age_Range] += p2Data.VO2;
+  const snapshot = { bet: betHistory.length };
+  ageRanges.forEach(range => {
+    snapshot[range] = ageRunningTotals[range];
   });
-  
-  updateParticipants();
-  
+  vo2RunningData.push(snapshot);
+
+  updateBarChart();
+  updateLineChart();
+  updateVo2Chart();
+}
+
+
+document
+  .getElementById("filter-participant1")
+  .addEventListener("change", updateBarChart);
+document
+  .getElementById("filter-participant2")
+  .addEventListener("change", updateBarChart);
+document.addEventListener("mousemove", function (event) {
+  d3.select("#tooltip")
+    .style("left", event.pageX + 15 + "px")
+    .style("top", event.pageY + 15 + "px");
+});
+
+updateParticipants();
+
+
+
+
+
+
+
+
+
+const ageRunningData = {};
+ageRanges.forEach(range => {
+    ageRunningData[range] = { sum: 0, count: 0 };
+});
+
+
+
+ageRunningData[p1Data.Age_Range].sum += p1Data.VO2;
+ageRunningData[p1Data.Age_Range].count++;
+ageRunningData[p2Data.Age_Range].sum += p2Data.VO2;
+ageRunningData[p2Data.Age_Range].count++;
+
+
+const snapshot = { bet: betHistory.length };
+ageRanges.forEach(range => {
+    snapshot[range] = ageRunningData[range].count > 0 
+        ? ageRunningData[range].sum / ageRunningData[range].count 
+        : null;
+});
+vo2RunningData.push(snapshot);
+
+
+
+function updateVo2Chart() {
+  const svg = d3.select("#vo2-chart svg");
+  const width = +svg.attr("width");
+  const height = +svg.attr("height");
+  svg.selectAll("*").remove();
+  const margin = { top: 20, right: 20, bottom: 40, left: 50 };
+  if (vo2RunningData.length === 0) return;
+
+  const xScale = d3
+    .scaleLinear()
+    .domain(d3.extent(vo2RunningData, d => d.bet))
+    .range([margin.left, width - margin.right]);
+  let yMin = Infinity,
+    yMax = -Infinity;
+  vo2RunningData.forEach(d => {
+    ageRanges.forEach(range => {
+      yMin = Math.min(yMin, d[range] || 0);
+      yMax = Math.max(yMax, d[range] || 0);
+    });
+  });
+  // const yScale = d3
+  //   .scaleLinear()
+  //   .domain([yMin - 10, yMax + 10])
+  //   .range([height - margin.bottom, margin.top]);
+
+  const yScale = d3
+        .scaleLinear()
+        .domain([0, d3.max(vo2RunningData, d => 
+            Math.max(...ageRanges.map(range => d[range] || 0))
+        )])
+        .range([height - margin.bottom, margin.top]);
+
+
+
+  // Draw axes.
+  const xAxis = d3.axisBottom(xScale);
+  svg.append("g")
+     .attr("transform", `translate(0, ${height - margin.bottom})`)
+     .call(xAxis)
+     .append("text")
+     .attr("x", width - margin.right)
+     .attr("y", -10)
+     .attr("fill", "black")
+     .style("text-anchor", "end")
+     .text("Bet Number");
+
+  const yAxis = d3.axisLeft(yScale);
+  svg.append("g")
+     .attr("transform", `translate(${margin.left}, 0)`)
+     .call(yAxis)
+     .append("text")
+     .attr("x", 5)
+     .attr("y", margin.top)
+     .attr("fill", "black")
+     .text("VO₂ Running Total");
+
+  const colorScale = d3
+    .scaleOrdinal()
+    .domain(ageRanges)
+    .range(["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd"]);
+
+  // ageRanges.forEach(range => {
+  //   const line = d3
+  //     .line()
+  //     .x(d => xScale(d.bet))
+  //     .y(d => yScale(d[range] || 0))
+  //     .curve(d3.curveMonotoneX);
+  //   svg.append("path")
+  //      .datum(vo2RunningData)
+  //      .attr("fill", "none")
+  //      .attr("stroke", colorScale(range))
+  //      .attr("stroke-width", 2)
+  //      .attr("d", line);
+  // });
+
+  ageRanges.forEach(range => {
+    const line = d3
+        .line()
+        .x(d => xScale(d.bet))
+        .y(d => d[range] ? yScale(d[range]) : yScale(0))
+        .defined(d => d[range] !== null)
+        .curve(d3.curveMonotoneX);
+
+    svg.append("path")
+        .datum(vo2RunningData)
+        .attr("fill", "none")
+        .attr("stroke", colorScale(range))
+        .attr("stroke-width", 2)
+        .attr("d", line);
+  });
+
+
+
+  // Add a legend.
+  const legend = svg
+    .append("g")
+    .attr("transform", `translate(${width - margin.right - 100}, ${margin.top})`);
+  ageRanges.forEach((range, i) => {
+    legend.append("rect")
+          .attr("x", 0)
+          .attr("y", i * 20)
+          .attr("width", 10)
+          .attr("height", 10)
+          .attr("fill", colorScale(range));
+    legend.append("text")
+          .attr("x", 15)
+          .attr("y", i * 20 + 10)
+          .text(range)
+          .attr("font-size", "12px")
+          .attr("fill", "black");
+  });
+
+  svg.select(".y-axis-label")
+        .text("VO₂ Running Average");
+}

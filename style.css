@@ -119,3 +119,35 @@
     display: none;
   }
   
+
+  .game-description-box {
+    border: 3px solid #2c3e50;  
+    padding: 20px;
+    max-width: 1500px;
+    margin: 30px auto;
+    border-radius: 12px;
+    background-color: #ecf0f1;  
+    box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.15);
+    font-family: 'Arial', sans-serif;
+    text-align: center;
+}
+
+.game-description-box h2 {
+    color: #07131b; 
+    margin-bottom: 12px;
+    font-size: 24px;
+}
+
+.game-description-box p {
+    font-size: 16px;
+    color: #2c3e50; 
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+    .game-description-box {
+        max-width: 90%;
+        padding: 15px;
+    }
+}

@@ -4,22 +4,27 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>VO2 Betting Game</title>
-  <!-- Link to external CSS -->
   <link rel="stylesheet" href="style.css">
-  <!-- Include D3 library -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 <body>
-  <div class="header">
-    <h2>VO2 Betting Game</h2>
-    <p>
-      There are two participants of different age ranges. Place your bet on one of them.
-      Your bet wins if your chosen participant has a higher VO2 level than the other.
+  <div class="game-description-box">
+    <h2>Cardio Casino and Resorts: VO₂ Betting Game</h2>
+        <p>
+            Step into the world of VO₂ betting, where you predict the endurance levels of two participants from different age groups.
+            Your challenge is simple: place a bet on the participant you believe has the higher VO₂ level. If your chosen participant 
+            outperforms the other, you win!
+        </p>
+        <p>
+            VO₂ levels are a key indicator of cardiovascular fitness that tend to fluctuate with age. This interactive game adds a layer of 
+            excitement to learning about VO₂ trends and allows you to uncover fascinating insights into how endurance varies across different 
+            age groups. Will you trust your instincts or rely on scientific knowledge? Place your bets and uncover trends!
+        </p>
+    </div>
     </p>
   </div>
 
   <div class="main-container">
-    <!-- Left Column: Betting Controls -->
     <div class="betting-controls">
       <h2>Betting Controls</h2>
       <div class="participant-info" id="participant1">
@@ -44,33 +49,32 @@
       <div class="earnings" id="earnings">Earnings: $0</div>
     </div>
 
-    <!-- Right Column: Charts -->
+
     <div class="charts-container">
       <div class="filter-controls">
         <label><input type="checkbox" id="filter-participant1" checked> Show Participant 1 bets</label>
         <label><input type="checkbox" id="filter-participant2" checked> Show Participant 2 bets</label>
       </div>
-      <!-- Bar Chart for Bet History -->
+
       <div id="chart" class="chart">
         <h3>Bet History (Per Bet Outcome)</h3>
         <svg width="600" height="400"></svg>
       </div>
-      <!-- Line Chart for Cumulative Earnings -->
+
       <div id="line-chart" class="chart">
         <h3>Cumulative Earnings</h3>
         <svg width="600" height="400"></svg>
       </div>
-      <!-- VO2 Running Totals by Age Range Chart -->
       <div id="vo2-chart" class="chart">
         <h3>VO2 Running Totals by Age Range</h3>
         <svg width="600" height="400"></svg>
       </div>
+
     </div>
   </div>
 
   <div class="tooltip" id="tooltip"></div>
   
-  <!-- Link to external JavaScript -->
   <script src="script.js"></script>
 </body>
 </html>
